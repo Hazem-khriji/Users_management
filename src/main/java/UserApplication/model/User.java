@@ -1,8 +1,7 @@
 package UserApplication.model;
 
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,11 +10,11 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="user_table")
-@ApiModel(description= "Here we got the users infos")
+@Schema(description = "Here we got the users info")
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @ApiModelProperty(notes= "The user ID should be unique")
+    @Schema(description = "The user ID should be unique", example = "1")
     private Long id;
     private String firstName;
     private String lastName;
