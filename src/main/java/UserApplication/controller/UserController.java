@@ -99,35 +99,32 @@ public class UserController {
             summary = "Update user",
             description = "Admin-only endpoint to update user."
     )
-    @PutMapping({"/{id}"})
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<User> updateUser(@PathVariable Long id,@RequestBody User user) {
-        Optional<User> existingUser = this.userService.getUserById(user.getId());
-        if (existingUser.isEmpty()) {
-            throw(new UserNotFoundException("User with such Id was not found"));
-        }
-        else{
-            user.setId(id);
-            User updatedUser = this.userService.addUser(user);
-            return ResponseEntity.ok(updatedUser);
-        }
-    }
 
-    @Operation(
-            summary = "Update user",
-            description = "Admin-only endpoint to update user."
-    )
-    @PutMapping({"/{id}/{email}"})
+    @PutMapping({"/{value:.+}"})
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @PathVariable String email) {
-        Optional<User> existingUser = this.userService.getUserById(id);
-        if (existingUser.isEmpty()) {
-            throw(new UserNotFoundException("User with such Id was not found"));
+    public ResponseEntity<User> updateUser(@PathVariable String value,@RequestBody User user) {
+        if(value.matches("\\d+")) {
+            Long id = Long.parseLong(value);
+            Optional<User> existingUser = this.userService.getUserById(id);
+            if (existingUser.isEmpty()) {
+                throw(new UserNotFoundException("User with such Id was not found"));
+            }
+            else{
+                user.setId(id);
+                User updatedUser = this.userService.addUser(user);
+                return ResponseEntity.ok(updatedUser);
+            }
         }
         else{
-            ((User) existingUser.get()).setEmail(email);
-            User updatedUser = this.userService.addUser(existingUser.get());
-            return ResponseEntity.ok(updatedUser);
+            Optional<User> possibleUser = this.userService.getUserByEmail(value);
+            if (possibleUser.isPresent()) {
+                user.setId(possibleUser.get().getId());
+                User updatedUser = this.userService.addUser(user);
+                return ResponseEntity.ok(updatedUser);
+            }
+            else{
+                throw(new UserNotFoundException("User with such email was not found"));
+            }
         }
     }
 
